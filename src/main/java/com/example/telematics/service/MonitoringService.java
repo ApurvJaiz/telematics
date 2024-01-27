@@ -1,8 +1,9 @@
 package com.example.telematics.service;
+
 import com.example.telematics.model.TelematicsData;
+import com.example.telematics.rule.MonitoringRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.telematics.rule.MonitoringRule;
 
 import java.util.ArrayList;
 import java.util.List;
