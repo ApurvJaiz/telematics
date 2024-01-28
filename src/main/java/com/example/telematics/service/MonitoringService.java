@@ -2,20 +2,26 @@ package com.example.telematics.service;
 
 import com.example.telematics.model.TelematicsData;
 import com.example.telematics.rule.MonitoringRule;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+@Slf4j
 @Service
 public class MonitoringService {
 
     @Autowired
     private TelematicsService telematicsService;
 
+    @Value("${monitoring.check.frequency}")
+    private String monitoringFrequency;
+
     // List to store monitoring rules
-    private List<MonitoringRule> monitoringRules = new ArrayList<>();
+    private final List<MonitoringRule> monitoringRules = new ArrayList<>();
 
     // Method to add a monitoring rule
     public void addMonitoringRule(MonitoringRule rule) {
@@ -24,9 +30,14 @@ public class MonitoringService {
 
     // Method to monitor telematics data and execute actions based on rules
     public void monitorTelematicsData() {
-        // Retrieve telematics data from the TelematicsService
-        List<TelematicsData> telematicsDataList = telematicsService.getAllTelematicsData();
 
+        LocalDateTime currentTime = LocalDateTime.now();
+        int delayFrequencyInSeconds = Integer.parseInt(monitoringFrequency)/1000;
+        LocalDateTime startTime = currentTime.minusSeconds(delayFrequencyInSeconds);
+
+        List<TelematicsData> telematicsDataList = telematicsService.findByTimestampBetween(startTime, currentTime);
+
+        //log.debug("Monitor start time: {} -  end time {}", startTime, currentTime);
         // Apply monitoring rules to the telematics data
         for (TelematicsData telematicsData : telematicsDataList) {
             for (MonitoringRule rule : monitoringRules) {

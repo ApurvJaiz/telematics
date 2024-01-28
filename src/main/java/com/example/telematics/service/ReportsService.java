@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Component
 public class ReportsService {
 
-    @Value("${telematics.speed.limit ? : 80}")
+    @Value("${telematics.speed.limit}")
     private String speedLimit;
 
     @Autowired
@@ -41,7 +41,7 @@ public class ReportsService {
     public List<String> generateDailyOverspeedingReport(LocalDate inputDate) {
         List<TelematicsData> telematicsDataList = telematicsDataRepository.getAllTelematicsData();
         List<TelematicsData> filteredData = getTelematicsData(inputDate, telematicsDataList);
-        return generateOverspeedingReport(inputDate+"_1d_overspeeding_report.csv", filteredData);
+        return generateOverspeedingReport(inputDate+"_daily_overspeeding_report.csv", filteredData);
     }
 
     public List<String> generateMonthlyOverspeedingReport(int month, int year) {

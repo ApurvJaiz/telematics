@@ -3,10 +3,7 @@ package com.example.telematics.repository;
 import com.example.telematics.model.TelematicsData;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -24,6 +21,9 @@ public class TelematicsDataRepository {
     }
 
     public void saveTelematicsData(String vehicleId, TelematicsData telematicsData) {
+        if(Objects.isNull(telematicsData.getTimestamp())) {
+            telematicsData.setTimestamp(new Date(System.currentTimeMillis()));
+        }
         telematicsDataMap.computeIfAbsent(vehicleId, key -> new ArrayList<>()).add(telematicsData);
     }
 

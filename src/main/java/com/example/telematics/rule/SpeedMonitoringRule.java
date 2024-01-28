@@ -1,12 +1,14 @@
 package com.example.telematics.rule;
 
 import com.example.telematics.model.TelematicsData;
+import lombok.extern.slf4j.Slf4j;
 
-public class SpeedLimitRule implements MonitoringRule {
+@Slf4j
+public class SpeedMonitoringRule implements MonitoringRule {
 
     private double speedLimit;
 
-    public SpeedLimitRule(double speedLimit) {
+    public SpeedMonitoringRule(double speedLimit) {
         this.speedLimit = speedLimit;
     }
 
@@ -18,7 +20,7 @@ public class SpeedLimitRule implements MonitoringRule {
     @Override
     public void executeAction(TelematicsData telematicsData) {
         // Example: Send a notification about speeding
-        System.out.println("Notification: Vehicle " + telematicsData.getVehicleId() +
+        log.warn("Notification: Vehicle " + telematicsData.getVehicleId() +
                 " is exceeding the speed limit. Speed: " + telematicsData.getSpeed() + " kmph");
     }
 }
