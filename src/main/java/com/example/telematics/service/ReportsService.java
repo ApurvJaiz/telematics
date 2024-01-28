@@ -19,37 +19,35 @@ import java.util.stream.Collectors;
 @Component
 public class ReportsService {
 
-    @Value("${telematics.speed.limit ? : '80'}")
+    @Value("${telematics.speed.limit ? : 80}")
     private String speedLimit;
 
     @Autowired
     private TelematicsDataRepository telematicsDataRepository;
 
-    public void generateDailyDistanceReport(LocalDate inputDate) {
-        List<TelematicsData> telematicsDataList = telematicsDataRepository.getAllTelematicsData();
-        List<TelematicsData> filteredData = telematicsDataList.stream()
-                .filter(data -> data.getTimestamp().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().equals(inputDate))
-                .collect(Collectors.toList());
-        generateDistanceReport(inputDate+"_daily_distance_report.csv", filteredData);
-    }
-
-
-    public void generateMonthlyDistanceReport(int month, int year) {
-        List<TelematicsData> telematicsDataList = telematicsDataRepository.getAllTelematicsData();
-        List<TelematicsData> filteredData = getTelematicsData(month, year, telematicsDataList);
-        generateDistanceReport(month+"_"+year+"_monthly_distance_report.csv", filteredData);
-    }
-
-    public void generateDailyOverspeedingReport(LocalDate inputDate) {
+    public Map<String, Double> generateDailyDistanceReport(LocalDate inputDate) {
         List<TelematicsData> telematicsDataList = telematicsDataRepository.getAllTelematicsData();
         List<TelematicsData> filteredData = getTelematicsData(inputDate, telematicsDataList);
-        generateOverspeedingReport(inputDate+"_1d_overspeeding_report.csv", filteredData);
+        return generateDistanceReport(inputDate+"_daily_distance_report.csv", filteredData);
     }
 
-    public void generateMonthlyOverspeedingReport(int month, int year) {
+
+    public Map<String, Double> generateMonthlyDistanceReport(int month, int year) {
         List<TelematicsData> telematicsDataList = telematicsDataRepository.getAllTelematicsData();
         List<TelematicsData> filteredData = getTelematicsData(month, year, telematicsDataList);
-        generateOverspeedingReport(month+"_"+year+"_overspeeding_report.csv", filteredData);
+        return generateDistanceReport(month+"_"+year+"_monthly_distance_report.csv", filteredData);
+    }
+
+    public List<String> generateDailyOverspeedingReport(LocalDate inputDate) {
+        List<TelematicsData> telematicsDataList = telematicsDataRepository.getAllTelematicsData();
+        List<TelematicsData> filteredData = getTelematicsData(inputDate, telematicsDataList);
+        return generateOverspeedingReport(inputDate+"_1d_overspeeding_report.csv", filteredData);
+    }
+
+    public List<String> generateMonthlyOverspeedingReport(int month, int year) {
+        List<TelematicsData> telematicsDataList = telematicsDataRepository.getAllTelematicsData();
+        List<TelematicsData> filteredData = getTelematicsData(month, year, telematicsDataList);
+        return generateOverspeedingReport(month+"_"+year+"_overspeeding_report.csv", filteredData);
     }
 
     public List<TelematicsData> getTelematicsData(LocalDate inputDate, List<TelematicsData> telematicsDataList) {
@@ -60,17 +58,18 @@ public class ReportsService {
 
     public List<TelematicsData> getTelematicsData(int month, int year, List<TelematicsData> telematicsDataList) {
         return telematicsDataList.stream()
-                .filter(data -> data.getTimestamp().getYear() == year && data.getTimestamp().getMonth() == month)
+                .filter(data -> data.getTimestamp().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getYear() == year)
+                .filter(data -> data.getTimestamp().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getMonthValue() == month)
                 .collect(Collectors.toList());
     }
 
-    public void generateDistanceReport(String fileName, List<TelematicsData> telematicsDataList) {
+    public Map<String, Double> generateDistanceReport(String fileName, List<TelematicsData> telematicsDataList) {
 
         // Mapping telematics data to vehicleId and totalDistanceCovered
         Map<String, Double> distanceByVehicle = calculateTotalDistance(telematicsDataList);
 
         try (Writer writer = new FileWriter(fileName)) {
-            writer.write("VehicleId,TotalDistanceCovered\n");
+            writer.write("Vehicle ID,Total Distance Covered (KM)\n");
             distanceByVehicle.forEach((vehicleId, totalDistanceCovered) -> {
                 try {
                     writer.write(vehicleId + "," + totalDistanceCovered + "\n");
@@ -81,12 +80,13 @@ public class ReportsService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return distanceByVehicle;
     }
 
-    public void generateOverspeedingReport(String fileName, List<TelematicsData> telematicsDataList) {
+    public List<String> generateOverspeedingReport(String fileName, List<TelematicsData> telematicsDataList) {
         List<String> overspeedingVehicle = getOverspeedingVehicle(telematicsDataList);
         try (Writer writer = new FileWriter(fileName)) {
-            writer.write("VehicleId\n"); // CSV header
+            writer.write("Vehicle ID\n"); // CSV header
             overspeedingVehicle.forEach(vehicleId -> {
                 try {
                     writer.write(vehicleId + "\n");
@@ -98,6 +98,7 @@ public class ReportsService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return overspeedingVehicle;
     }
 
     public List<String> getOverspeedingVehicle(List<TelematicsData> telematicsDataList) {

@@ -5,10 +5,7 @@ import com.example.telematics.dto.TotalDistanceReport;
 import com.example.telematics.service.ReportsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -22,36 +19,34 @@ public class ReportsController {
     private ReportsService reportsService;
 
     @GetMapping("/dailyDistances")
-    public ResponseEntity<List<TotalDistanceReport>> getDailyDistances(@RequestParam(name = "date") LocalDate date) {
-        return ResponseEntity.ok(Collections.emptyList()); // Placeholder value, replace with actual logic
+    public ResponseEntity getDailyDistances(@RequestParam(name = "date") String date) {
+        return ResponseEntity.ok(reportsService.generateDailyDistanceReport(LocalDate.parse(date)));
     }
 
     @GetMapping("/monthlyDistances")
-    public ResponseEntity<List<TotalDistanceReport>> getTotalDistances(@RequestParam(name = "month") String month,
+    public ResponseEntity getTotalDistances(@RequestParam(name = "month") String month,
                                                                        @RequestParam(name = "year") String year) {
-        return ResponseEntity.ok(Collections.emptyList()); // Placeholder value, replace with actual logic
+        return ResponseEntity.ok(reportsService.generateMonthlyDistanceReport(Integer.parseInt(month),
+                Integer.parseInt(year)));
     }
 
     @GetMapping("/dailyOverspeedingVehicles")
-    public ResponseEntity<List<OverSpeedingReport>> getDailyOverspeedingVehicles(@RequestParam(name = "date") LocalDate date) {
-        // Implement logic to fetch overspeeding reports for all vehicles
-        return ResponseEntity.ok(Collections.emptyList()); // Placeholder value, replace with actual logic
+    public ResponseEntity getDailyOverspeedingVehicles(@RequestParam(name = "date") String date) {
+        return ResponseEntity.ok(reportsService.generateDailyOverspeedingReport(LocalDate.parse(date)));
     }
 
     @GetMapping("/monthlyOverspeedingVehicles")
-    public ResponseEntity<List<OverSpeedingReport>> getMonthlyOverspeedingVehicles(@RequestParam(name = "month") String month,
+    public ResponseEntity getMonthlyOverspeedingVehicles(@RequestParam(name = "month") String month,
                                                                                    @RequestParam(name = "year") String year) {
-        // Implement logic to fetch overspeeding reports for all vehicles
-        return ResponseEntity.ok(Collections.emptyList()); // Placeholder value, replace with actual logic
+        return ResponseEntity.ok(reportsService.generateMonthlyOverspeedingReport(Integer.parseInt(month), Integer.parseInt(year)));
     }
 //    @GetMapping("/totalDistances/{vehicleId}")
 //    public ResponseEntity<TotalDistanceReport> getVehicleTotalDistances(@PathVariable String vehicleId) {
-//        return ResponseEntity.ok(new TotalDistanceReport()); // Placeholder value, replace with actual logic
+//        return ResponseEntity.ok(new TotalDistanceReport());
 //    }
-
+//
 //    @GetMapping("/overspeedingVehicles/{vehicleId}")
 //    public ResponseEntity<OverSpeedingReport> getVehicleOverspeedingReport(@PathVariable String vehicleId) {
-//        // Implement logic to fetch overspeeding report for a specific vehicle
-//        return ResponseEntity.ok(new OverSpeedingReport()); // Placeholder value, replace with actual logic
+//        return ResponseEntity.ok(new OverSpeedingReport());
 //    }
 }
