@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class TelematicsService {
 
     @Autowired
-    private TelematicsDataRepository telematicsDataRepository;
+    public TelematicsDataRepository telematicsDataRepository;
 
     public void saveTelematicsData(TelematicsData telematicsData) {
         telematicsDataRepository.saveTelematicsData(telematicsData.getVehicleId(), telematicsData);
@@ -31,5 +31,10 @@ public class TelematicsService {
         return telematicsDataRepository.getAllTelematicsData().stream()
                 .filter(data -> data.getTimestamp().after(startDate) && data.getTimestamp().before(endDate))
                 .collect(Collectors.toList());
+    }
+
+    public List<TelematicsData>  getTelematicsData(String vehicleId) {
+        return telematicsDataRepository.getTelematicsData(vehicleId);
+
     }
 }

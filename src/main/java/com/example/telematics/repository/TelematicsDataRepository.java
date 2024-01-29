@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 public class TelematicsDataRepository {
     private static TelematicsDataRepository instance;
     private Map<String, List<TelematicsData>> telematicsDataMap;
+
     private TelematicsDataRepository() {
         telematicsDataMap = new HashMap<>();
     }

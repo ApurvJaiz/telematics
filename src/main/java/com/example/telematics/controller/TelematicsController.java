@@ -30,6 +30,11 @@ public class TelematicsController {
         return ResponseEntity.ok(telematicsService.getAllTelematicsData());
     }
 
+    @GetMapping("/{vehicleId}")
+    public ResponseEntity getTelematicsData(@PathVariable String vehicleId) {
+        return ResponseEntity.ok(telematicsService.getTelematicsData(vehicleId));
+    }
+
     @Scheduled(fixedDelayString = "${monitoring.check.frequency}")
     public void performMonitoring() {
         monitoringService.monitorTelematicsData();
