@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
-
 @RestController
 @RequestMapping("/reports")
 public class ReportsController {
@@ -19,25 +17,24 @@ public class ReportsController {
 
     @GetMapping("/dailyDistances")
     public ResponseEntity getDailyDistances(@RequestParam(name = "date") String date) {
-        return ResponseEntity.ok(reportsService.generateDailyDistanceReport(LocalDate.parse(date)));
+        return ResponseEntity.ok(reportsService.generateDailyDistanceReport(date));
     }
 
     @GetMapping("/monthlyDistances")
     public ResponseEntity getTotalDistances(@RequestParam(name = "month") String month,
                                                                        @RequestParam(name = "year") String year) {
-        return ResponseEntity.ok(reportsService.generateMonthlyDistanceReport(Integer.parseInt(month),
-                Integer.parseInt(year)));
+        return ResponseEntity.ok(reportsService.generateMonthlyDistanceReport(month, year));
     }
 
     @GetMapping("/dailyOverspeedingVehicles")
     public ResponseEntity getDailyOverspeedingVehicles(@RequestParam(name = "date") String date) {
-        return ResponseEntity.ok(reportsService.generateDailyOverspeedingReport(LocalDate.parse(date)));
+        return ResponseEntity.ok(reportsService.generateDailyOverspeedingReport(date));
     }
 
     @GetMapping("/monthlyOverspeedingVehicles")
     public ResponseEntity getMonthlyOverspeedingVehicles(@RequestParam(name = "month") String month,
                                                                                    @RequestParam(name = "year") String year) {
-        return ResponseEntity.ok(reportsService.generateMonthlyOverspeedingReport(Integer.parseInt(month), Integer.parseInt(year)));
+        return ResponseEntity.ok(reportsService.generateMonthlyOverspeedingReport(month, year));
     }
 //    @GetMapping("/totalDistances/{vehicleId}")
 //    public ResponseEntity<TotalDistanceReport> getVehicleTotalDistances(@PathVariable String vehicleId) {

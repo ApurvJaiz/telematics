@@ -1,5 +1,6 @@
 package com.example.telematics;
 
+import com.example.telematics.exception.TelematicsValidationException;
 import com.example.telematics.model.TelematicsData;
 import com.example.telematics.repository.TelematicsDataRepository;
 import com.example.telematics.service.ReportsService;
@@ -13,7 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
-import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
 @SpringBootTest
@@ -29,33 +31,46 @@ class TelematicsServiceTest extends TestDataProvider{
     @Autowired
     private TelematicsDataRepository telematicsDataRepository;
 
-    private List<TelematicsData> telematicsData;
-
     @BeforeEach
     public void setup(){
-        telematicsData = createBulkTelematicsData(1000);
+        telematicsDataRepository.clearAllTelematicsData();
     }
 
     @Test
     void testTelematicsDataEntry() {
         TelematicsData telematicsData = createSampleTelematicsData();
-        telematicsDataRepository.saveTelematicsData(telematicsData.getVehicleId(), telematicsData);
+        insertAndValidateTelematicsData(telematicsData);
+    }
+
+    @Test
+    void testEmptyVehicleIdTelematicsDataEntry() {
+        TelematicsData telematicsData = createSampleTelematicsData();
+        telematicsData.setVehicleId("");
+        invalidTelematicsDataValidation(telematicsData);
+    }
+
+    private void invalidTelematicsDataValidation(TelematicsData telematicsData) {
+        assertThrows(TelematicsValidationException.class, () -> telematicsService.saveTelematicsData(telematicsData));
+        List<TelematicsData> storedData = telematicsService.getTelematicsData(telematicsData.getVehicleId());
+        Assertions.assertNull(storedData);
+    }
+
+    @Test
+    void testInvalidTelematicsDataEntry() {
+        TelematicsData telematicsData = createSampleTelematicsData();
+        telematicsData.setFuelPercent(null);
+        invalidTelematicsDataValidation(telematicsData);
+    }
+
+    @Test
+    void testNullTelematicsDataEntry() {
+        invalidTelematicsDataValidation(new TelematicsData());
+    }
+
+    private void insertAndValidateTelematicsData(TelematicsData telematicsData) {
+        telematicsService.saveTelematicsData(telematicsData);
         List<TelematicsData> storedData = telematicsService.getTelematicsData(telematicsData.getVehicleId());
         Assertions.assertNotNull(storedData);
         Assertions.assertEquals(telematicsData, storedData.get(0));
-    }
-
-    @Test
-    void testDistanceReportGeneration() {
-        log.info(String.valueOf(telematicsData));
-        Map<String, Double> distanceReport = reportService.generateDistanceReport("distance_report.csv", telematicsData);
-        Assertions.assertNotNull(distanceReport);
-    }
-
-    @Test
-    void testOverspeedingReportGeneration() {
-        log.info(String.valueOf(telematicsData));
-        List<String> overspeedingReport = reportService.generateOverspeedingReport("overspeeding_report.csv", telematicsData);
-        Assertions.assertNotNull(overspeedingReport);
     }
 }

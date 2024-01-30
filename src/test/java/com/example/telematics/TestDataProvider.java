@@ -2,7 +2,10 @@ package com.example.telematics;
 
 import com.example.telematics.model.TelematicsData;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 public class TestDataProvider {
 

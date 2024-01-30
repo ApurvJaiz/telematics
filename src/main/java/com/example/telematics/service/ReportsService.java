@@ -1,21 +1,25 @@
 package com.example.telematics.service;
 
+import com.example.telematics.exception.TelematicsApplicationException;
+import com.example.telematics.exception.TelematicsValidationException;
 import com.example.telematics.model.TelematicsData;
 import com.example.telematics.repository.TelematicsDataRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.Writer;
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class ReportsService {
 
@@ -25,28 +29,30 @@ public class ReportsService {
     @Autowired
     private TelematicsDataRepository telematicsDataRepository;
 
-    public Map<String, Double> generateDailyDistanceReport(LocalDate inputDate) {
+    public Map<String, Double> generateDailyDistanceReport(String inputDate) {
         List<TelematicsData> telematicsDataList = telematicsDataRepository.getAllTelematicsData();
-        List<TelematicsData> filteredData = getTelematicsData(inputDate, telematicsDataList);
+        List<TelematicsData> filteredData = getTelematicsData(validateDateInput(inputDate), telematicsDataList);
         return generateDistanceReport(inputDate+"_daily_distance_report.csv", filteredData);
     }
 
 
-    public Map<String, Double> generateMonthlyDistanceReport(int month, int year) {
+    public Map<String, Double> generateMonthlyDistanceReport(String month, String year) {
+        validateMonthInput(month, year);
         List<TelematicsData> telematicsDataList = telematicsDataRepository.getAllTelematicsData();
-        List<TelematicsData> filteredData = getTelematicsData(month, year, telematicsDataList);
+        List<TelematicsData> filteredData = getTelematicsData(Integer.parseInt(month), Integer.parseInt(year), telematicsDataList);
         return generateDistanceReport(month+"_"+year+"_monthly_distance_report.csv", filteredData);
     }
 
-    public List<String> generateDailyOverspeedingReport(LocalDate inputDate) {
+    public List<String> generateDailyOverspeedingReport(String inputDate) {
         List<TelematicsData> telematicsDataList = telematicsDataRepository.getAllTelematicsData();
-        List<TelematicsData> filteredData = getTelematicsData(inputDate, telematicsDataList);
+        List<TelematicsData> filteredData = getTelematicsData(validateDateInput(inputDate), telematicsDataList);
         return generateOverspeedingReport(inputDate+"_daily_overspeeding_report.csv", filteredData);
     }
 
-    public List<String> generateMonthlyOverspeedingReport(int month, int year) {
+    public List<String> generateMonthlyOverspeedingReport(String month, String year) {
+        validateMonthInput(month, year);
         List<TelematicsData> telematicsDataList = telematicsDataRepository.getAllTelematicsData();
-        List<TelematicsData> filteredData = getTelematicsData(month, year, telematicsDataList);
+        List<TelematicsData> filteredData = getTelematicsData(Integer.parseInt(month), Integer.parseInt(year), telematicsDataList);
         return generateOverspeedingReport(month+"_"+year+"_overspeeding_report.csv", filteredData);
     }
 
@@ -73,12 +79,12 @@ public class ReportsService {
             distanceByVehicle.forEach((vehicleId, totalDistanceCovered) -> {
                 try {
                     writer.write(vehicleId + "," + totalDistanceCovered + "\n");
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    throw new TelematicsApplicationException("Error while writing to CSV distance report", e);
                 }
             });
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new TelematicsApplicationException("Error while generating distance report", e);
         }
         return distanceByVehicle;
     }
@@ -90,13 +96,13 @@ public class ReportsService {
             overspeedingVehicle.forEach(vehicleId -> {
                 try {
                     writer.write(vehicleId + "\n");
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    throw new TelematicsApplicationException("Error while writing to CSV Over speeding report", e);
                 }
             });
             writer.write("Total = "+overspeedingVehicle.size()+"\n");
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new TelematicsApplicationException("Error while generating over speeding report", e);
         }
         return overspeedingVehicle;
     }
@@ -145,6 +151,29 @@ public class ReportsService {
         double centralAngle = 2 * Math.atan2(Math.sqrt(aux), Math.sqrt(1 - aux));
 
         return earthRadius * centralAngle;
+    }
+
+    private LocalDate validateDateInput(String date) {
+        try {
+            return LocalDate.parse(date);
+        } catch (Exception e) {
+            throw new TelematicsValidationException("Invalid date format: " + date);
+        }
+    }
+
+    private void validateMonthInput(String month, String year) {
+        try {
+            int mm = Integer.parseInt(month);
+            int yyyy = Integer.parseInt(year);
+            if(mm < 1 || mm > 12) {
+                throw new TelematicsValidationException("Invalid month: " + month);
+            }
+            if(yyyy < 1970 || yyyy > Integer.parseInt(String.valueOf(Year.now()))) {
+                throw new TelematicsValidationException("Invalid year: " + year);
+            }
+        } catch (Exception e) {
+            throw new TelematicsValidationException("Invalid month/year format: " + month + "/"+year);
+        }
     }
 
 }
