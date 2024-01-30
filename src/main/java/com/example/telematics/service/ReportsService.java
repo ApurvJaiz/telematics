@@ -157,7 +157,7 @@ public class ReportsService {
         try {
             return LocalDate.parse(date);
         } catch (Exception e) {
-            throw new TelematicsValidationException("Invalid date format: " + date);
+            throw new TelematicsValidationException("Invalid date value: " + date);
         }
     }
 
@@ -172,7 +172,7 @@ public class ReportsService {
                 throw new TelematicsValidationException("Invalid year: " + year);
             }
         } catch (Exception e) {
-            throw new TelematicsValidationException("Invalid month/year format: " + month + "/"+year);
+            throw new TelematicsValidationException("Invalid month/year value: " + month + "/"+year);
         }
     }
 
