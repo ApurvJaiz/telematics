@@ -2,7 +2,6 @@ package com.example.telematics.controller;
 
 import com.example.telematics.service.MonitoringService;
 import com.example.telematics.service.QueryService;
-import com.example.telematics.service.TelematicsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

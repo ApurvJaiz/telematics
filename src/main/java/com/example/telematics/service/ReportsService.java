@@ -53,7 +53,7 @@ public class ReportsService {
         validateMonthInput(month, year);
         List<TelematicsData> telematicsDataList = telematicsDataRepository.getAllTelematicsData();
         List<TelematicsData> filteredData = getTelematicsData(Integer.parseInt(month), Integer.parseInt(year), telematicsDataList);
-        return generateOverspeedingReport(month+"_"+year+"_overspeeding_report.csv", filteredData);
+        return generateOverspeedingReport(month+"_"+year+"_monthly_overspeeding_report.csv", filteredData);
     }
 
     public List<TelematicsData> getTelematicsData(LocalDate inputDate, List<TelematicsData> telematicsDataList) {
