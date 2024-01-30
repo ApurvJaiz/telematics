@@ -5,6 +5,7 @@ import com.example.telematics.rule.MonitoringRule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,11 @@ public class MonitoringService {
     // List to store monitoring rules
     private final List<MonitoringRule> monitoringRules = new ArrayList<>();
 
+    @Scheduled(fixedDelayString = "${monitoring.check.frequency}")
+    public void performMonitoring() {
+       monitorTelematicsData();
+    }
+
     // Method to add a monitoring rule
     public void addMonitoringRule(MonitoringRule rule) {
         monitoringRules.add(rule);
@@ -37,7 +43,7 @@ public class MonitoringService {
 
         List<TelematicsData> telematicsDataList = telematicsService.findByTimestampBetween(startTime, currentTime);
 
-        //log.debug("Monitor start time: {} -  end time {}", startTime, currentTime);
+        log.debug("Monitor start time: {} -  end time {}", startTime, currentTime);
         // Apply monitoring rules to the telematics data
         for (TelematicsData telematicsData : telematicsDataList) {
             for (MonitoringRule rule : monitoringRules) {
