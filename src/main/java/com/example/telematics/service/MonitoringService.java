@@ -16,7 +16,7 @@ import java.util.List;
 public class MonitoringService {
 
     @Autowired
-    private TelematicsService telematicsService;
+    private QueryService queryService;
 
     @Value("${monitoring.check.frequency}")
     private String monitoringFrequency;
@@ -41,7 +41,7 @@ public class MonitoringService {
         int delayFrequencyInSeconds = Integer.parseInt(monitoringFrequency)/1000;
         LocalDateTime startTime = currentTime.minusSeconds(delayFrequencyInSeconds);
 
-        List<TelematicsData> telematicsDataList = telematicsService.findByTimestampBetween(startTime, currentTime);
+        List<TelematicsData> telematicsDataList = queryService.findByTimestampBetween(startTime, currentTime);
 
         log.debug("Monitor start time: {} -  end time {}", startTime, currentTime);
         // Apply monitoring rules to the telematics data

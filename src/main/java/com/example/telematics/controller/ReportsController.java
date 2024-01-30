@@ -36,13 +36,4 @@ public class ReportsController {
                                                                                    @RequestParam(name = "year") String year) {
         return ResponseEntity.ok(reportsService.generateMonthlyOverspeedingReport(month, year));
     }
-//    @GetMapping("/totalDistances/{vehicleId}")
-//    public ResponseEntity<TotalDistanceReport> getVehicleTotalDistances(@PathVariable String vehicleId) {
-//        return ResponseEntity.ok(new TotalDistanceReport());
-//    }
-//
-//    @GetMapping("/overspeedingVehicles/{vehicleId}")
-//    public ResponseEntity<OverSpeedingReport> getVehicleOverspeedingReport(@PathVariable String vehicleId) {
-//        return ResponseEntity.ok(new OverSpeedingReport());
-//    }
 }

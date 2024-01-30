@@ -24,22 +24,6 @@ public class TelematicsService {
         telematicsDataRepository.saveTelematicsData(telematicsData.getVehicleId(), telematicsData);
     }
 
-    public List<TelematicsData> getAllTelematicsData() {
-        return telematicsDataRepository.getAllTelematicsData();
-    }
-
-    public List<TelematicsData> findByTimestampBetween(LocalDateTime startTime, LocalDateTime currentTime) {
-        Date startDate = Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
-        Date endDate = Date.from(currentTime.atZone(ZoneId.systemDefault()).toInstant());
-        return telematicsDataRepository.getAllTelematicsData().stream()
-                .filter(data -> data.getTimestamp().after(startDate) && data.getTimestamp().before(endDate))
-                .collect(Collectors.toList());
-    }
-
-    public List<TelematicsData>  getTelematicsData(String vehicleId) {
-        return telematicsDataRepository.getTelematicsData(vehicleId);
-
-    }
     private void validateTelematicsData(TelematicsData telematicsData) {
         if (telematicsData == null) {
             throw new TelematicsValidationException("TelematicsData is null");

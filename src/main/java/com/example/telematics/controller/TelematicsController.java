@@ -6,7 +6,10 @@ import com.example.telematics.service.TelematicsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/telematics")
@@ -22,16 +25,6 @@ public class TelematicsController {
     public ResponseEntity<String> receiveTelematicsData(@RequestBody TelematicsData telematicsData) {
         telematicsService.saveTelematicsData(telematicsData);
         return new ResponseEntity<>("Telematics data received successfully", HttpStatus.OK);
-    }
-
-    @GetMapping
-    public ResponseEntity getAllTelematicsData() {
-        return ResponseEntity.ok(telematicsService.getAllTelematicsData());
-    }
-
-    @GetMapping("/{vehicleId}")
-    public ResponseEntity getTelematicsData(@PathVariable String vehicleId) {
-        return ResponseEntity.ok(telematicsService.getTelematicsData(vehicleId));
     }
 
 }

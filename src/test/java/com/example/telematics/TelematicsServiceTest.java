@@ -3,6 +3,7 @@ package com.example.telematics;
 import com.example.telematics.exception.TelematicsValidationException;
 import com.example.telematics.model.TelematicsData;
 import com.example.telematics.repository.TelematicsDataRepository;
+import com.example.telematics.service.QueryService;
 import com.example.telematics.service.ReportsService;
 import com.example.telematics.service.TelematicsService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,9 @@ class TelematicsServiceTest extends TestDataProvider{
 
     @Autowired
     private TelematicsService telematicsService;
+
+    @Autowired
+    private QueryService queryService;
 
     @Autowired
     private ReportsService reportService;
@@ -51,7 +55,7 @@ class TelematicsServiceTest extends TestDataProvider{
 
     private void invalidTelematicsDataValidation(TelematicsData telematicsData) {
         assertThrows(TelematicsValidationException.class, () -> telematicsService.saveTelematicsData(telematicsData));
-        List<TelematicsData> storedData = telematicsService.getTelematicsData(telematicsData.getVehicleId());
+        List<TelematicsData> storedData = queryService.getTelematicsData(telematicsData.getVehicleId());
         Assertions.assertNull(storedData);
     }
 
@@ -69,7 +73,7 @@ class TelematicsServiceTest extends TestDataProvider{
 
     private void insertAndValidateTelematicsData(TelematicsData telematicsData) {
         telematicsService.saveTelematicsData(telematicsData);
-        List<TelematicsData> storedData = telematicsService.getTelematicsData(telematicsData.getVehicleId());
+        List<TelematicsData> storedData = queryService.getTelematicsData(telematicsData.getVehicleId());
         Assertions.assertNotNull(storedData);
         Assertions.assertEquals(telematicsData, storedData.get(0));
     }
